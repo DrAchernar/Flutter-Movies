@@ -46,7 +46,11 @@ class _Result {
     _vote_count = result['vote_count'];
     _id = result['id'];
     _video = result['video'];
-    _vote_average = result['vote_average'];
+    if (result['vote_average'] is int) {
+      _vote_average = result['vote_average'].toDouble();
+    } else {
+      _vote_average = result['vote_average'];
+    }
     _title = result['title'];
     _popularity = result['popularity'];
     _poster_path = result['poster_path'];
