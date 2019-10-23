@@ -29,6 +29,7 @@ class MovieDetailScreen extends StatefulWidget {
 class _MovieDetailScreenState extends State<MovieDetailScreen> {
   MovieDetailBloc bloc;
   final List<String> genresList = List<String>();
+  bool preventLoop = false;
 
   @override
   void didChangeDependencies() {
@@ -201,28 +202,51 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
 
   Widget chipLayout(MovieDetail data) {
     List<Widget> children = List<Widget>();
+    var genres = data.genres;
 
-    if (data.genres.isNotEmpty) {
-      var genres = data.genres;
+    if (data.genres.isNotEmpty && preventLoop == false) {
+      preventLoop = true;
       for (var i = 0; i < genres.length; i++) {
         String name = genres[i].name;
         print("Inside first loop");
         genresList.add(name);
       }
-
       for (var i = 0; i < genresList.length; i++) {
         print("Inside second loop");
         children.add(Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(5.0),
           child: Chip(
             label: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(genresList[i]),
+              padding: const EdgeInsets.all(3.0),
+              child: Text(
+                genresList[i],
+                style: TextStyle(
+                  fontSize: 12,
+                ),
+              ),
             ),
           ),
         ));
       }
-
+      return Wrap(direction: Axis.horizontal, children: children);
+    } else if (data.genres.isNotEmpty && preventLoop == true) {
+      for (var i = 0; i < genresList.length; i++) {
+        print("Inside second loop");
+        children.add(Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Chip(
+            label: Padding(
+              padding: const EdgeInsets.all(3.0),
+              child: Text(
+                genresList[i],
+                style: TextStyle(
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ),
+        ));
+      }
       return Wrap(direction: Axis.horizontal, children: children);
     } else {
       return Padding(
@@ -230,7 +254,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         child: Text(
           'No Genres Found',
           style: TextStyle(
-              fontSize: 20,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.white,
               fontStyle: FontStyle.italic),
