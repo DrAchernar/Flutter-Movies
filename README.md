@@ -1,4 +1,4 @@
-#Flutter Movies with Bottom Sheet Transition
+# Flutter Movies with Bottom Sheet Transition
 
 Modified [Flutter-Movies](https://github.com/mohak1283/Flutter-Movies.git) .Check it to see screenshots and other descriptions, 
 
@@ -9,7 +9,7 @@ whats different?
 -> Removed Similar Movies section
 -> Changed material positions
 
-##First Run
+## First Run
 
 `flutter pub get`
 
