@@ -1,4 +1,4 @@
-package com.example.moviesbloc;
+package org.nativescript.cineworld;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

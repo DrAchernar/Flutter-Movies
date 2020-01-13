@@ -3,12 +3,13 @@ class ItemModel {
   int _total_results;
   int _total_pages;
   List<_Result> _results = [];
+  static dynamic _coms = '';
 
   ItemModel.fromJson(Map<String, dynamic> parsedJson) {
-    print(parsedJson['results'].length);
     _page = parsedJson['page'];
     _total_results = parsedJson['total_results'];
     _total_pages = parsedJson['total_pages'];
+    _coms = parsedJson['comments'];
     List<_Result> temp = [];
     for (int i = 0; i < parsedJson['results'].length; i++) {
       _Result result = _Result(parsedJson['results'][i]);
@@ -16,6 +17,8 @@ class ItemModel {
     }
     _results = temp;
   }
+
+  dynamic get coms => _coms;
 
   List<_Result> get results => _results;
 
@@ -41,10 +44,13 @@ class _Result {
   bool _adult;
   String _overview;
   String _release_date;
+  dynamic _comment;
 
   _Result(result) {
     _vote_count = result['vote_count'];
     _id = result['id'];
+    _comment = ItemModel._coms["movie:$_id"];
+    _comment = _comment.split(";");
     _video = result['video'];
     if (result['vote_average'] is int) {
       _vote_average = result['vote_average'].toDouble();
@@ -52,7 +58,7 @@ class _Result {
       _vote_average = result['vote_average'];
     }
     _title = result['title'];
-    _popularity = result['popularity'];
+    _popularity = result['popularity'].toDouble();
     _poster_path = result['poster_path'];
     _original_language = result['original_language'];
     _original_title = result['original_title'];
@@ -63,6 +69,14 @@ class _Result {
     _adult = result['adult'];
     _overview = result['overview'];
     _release_date = result['release_date'];
+  }
+
+  String _checkComment() {
+    if (_comment.length > 2) {
+      return _comment[2];
+    } else {
+      return ' ';
+    }
   }
 
   String get release_date => _release_date;
@@ -92,4 +106,10 @@ class _Result {
   int get id => _id;
 
   int get vote_count => _vote_count;
+
+  String get sube => _comment[0];
+
+  String get comment => _comment[1];
+
+  String get comment2 => _checkComment();
 }

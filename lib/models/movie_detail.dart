@@ -5,13 +5,13 @@ class MovieDetail {
   String _homepage;
   int _id;
 
-  MovieDetail(
-      {bool adult,
-      String backdropPath,
-      List<Genres> genres,
-      String homepage,
-      int id,
-      }) {
+  MovieDetail({
+    bool adult,
+    String backdropPath,
+    List<Genres> genres,
+    String homepage,
+    int id,
+  }) {
     this._adult = adult;
     this._backdropPath = backdropPath;
     this._genres = genres;
@@ -20,17 +20,24 @@ class MovieDetail {
   }
 
   bool get adult => _adult;
+
   set adult(bool adult) => _adult = adult;
+
   String get backdropPath => _backdropPath;
+
   set backdropPath(String backdropPath) => _backdropPath = backdropPath;
 
   List<Genres> get genres => _genres;
+
   set genres(List<Genres> genres) => _genres = genres;
+
   String get homepage => _homepage;
+
   set homepage(String homepage) => _homepage = homepage;
+
   int get id => _id;
+
   set id(int id) => _id = id;
-  
 
   MovieDetail.fromJson(Map<String, dynamic> json) {
     _adult = json['adult'];
@@ -68,8 +75,11 @@ class Genres {
   }
 
   int get id => _id;
+
   set id(int id) => _id = id;
+
   String get name => _name;
+
   set name(String name) => _name = name;
 
   Genres.fromJson(Map<String, dynamic> json) {
@@ -84,4 +94,3 @@ class Genres {
     return data;
   }
 }
-

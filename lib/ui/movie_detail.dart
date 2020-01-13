@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:movies_bloc/blocs/movie_detail_bloc.dart';
 import 'package:movies_bloc/blocs/movie_detail_bloc_provider.dart';
-import 'package:movies_bloc/models/item_model.dart';
 import 'package:movies_bloc/models/movie_detail.dart';
-
+import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class MovieDetailScreen extends StatefulWidget {
   final posterUrl;
@@ -12,14 +14,22 @@ class MovieDetailScreen extends StatefulWidget {
   final String title;
   final String voteAverage;
   final int movieId;
+  final String comment;
+  final String comment2;
+  final String sube;
+  final String videos;
 
   MovieDetailScreen({
+    this.sube,
+    this.comment,
+    this.comment2,
     this.title,
     this.posterUrl,
     this.description,
     this.releaseDate,
     this.voteAverage,
     this.movieId,
+    this.videos,
   });
 
   @override
@@ -35,7 +45,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
   void didChangeDependencies() {
     bloc = MovieDetailBlocProvider.of(context).bloc;
     bloc.fetchTrailersById(widget.movieId);
-    bloc.fetchSimilarMoviesById(widget.movieId);
+    //bloc.fetchSimilarMoviesById(widget.movieId);
     super.didChangeDependencies();
   }
 
@@ -47,6 +57,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SafeArea(
         top: false,
@@ -55,14 +66,15 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
               SliverAppBar(
-                expandedHeight: 200.0,
+                iconTheme: IconThemeData(color: Colors.red),
+                expandedHeight: screenHeight / 3.5,
                 floating: false,
                 pinned: true,
                 elevation: 0.0,
                 flexibleSpace: FlexibleSpaceBar(
                     background: Image.network(
                   "https://image.tmdb.org/t/p/w500${widget.posterUrl}",
-                  fit: BoxFit.cover,
+                  fit: BoxFit.fitWidth,
                 )),
               ),
             ];
@@ -78,33 +90,22 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                   alignment: WrapAlignment.spaceBetween,
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
+                      padding: const EdgeInsets.only(top: 5.0),
                       child: Text(
                         widget.title,
                         style: TextStyle(
-                          fontSize: 25.0,
+                          fontSize: 20.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    RaisedButton.icon(
-                      onPressed: () {},
-                      textColor: Colors.white,
-                      label: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Reviews'),
-                      ),
-                      shape: StadiumBorder(),
-                      color: Colors.red,
-                      icon: Icon(Icons.rate_review, color: Colors.white),
-                    )
                   ],
                 ),
 
-                Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
+                Container(margin: EdgeInsets.only(top: 5.0, bottom: 5.0)),
                 Row(
                   children: <Widget>[
-                    Icon(
+                    /*Icon(
                       Icons.favorite,
                       color: Colors.red,
                     ),
@@ -114,23 +115,79 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                     Text(
                       widget.voteAverage,
                       style: TextStyle(
-                        fontSize: 18.0,
+                        fontSize: 15.0,
                       ),
+                    ),*/
+                    RaisedButton.icon(
+                      onPressed: () {
+                        _fetchFragman();
+                      },
+                      textColor: Colors.white,
+                      label: Padding(
+                        padding: const EdgeInsets.all(1.0),
+                        child: Text('Fragman'),
+                      ),
+                      shape: StadiumBorder(),
+                      color: Colors.red,
+                      icon: Icon(Icons.ondemand_video, color: Colors.white),
                     ),
                     Container(
-                      margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                      margin: EdgeInsets.only(left: 10.0, right: 8.0),
                     ),
                     Text(
                       widget.releaseDate,
                       style: TextStyle(
-                        fontSize: 18.0,
+                        fontSize: 15.0,
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(left: 8.0, right: 10.0),
+                    ),
+                    Text(
+                      'Şube: ' + widget.sube,
+                      style: TextStyle(
+                        fontSize: 15.0,
                       ),
                     ),
                   ],
                 ),
-                Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
+                Container(margin: EdgeInsets.only(top: 5.0, bottom: 5.0)),
                 Text(widget.description),
-                Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
+                Container(margin: EdgeInsets.only(top: 10.0, bottom: 0)),
+                Container(
+                  color: Colors.black12,
+                  width: double.maxFinite,
+                  height: 19.0,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      _checkCineworld(),
+                      style: TextStyle(
+                        wordSpacing: 1.2,
+                        fontSize: 14.0,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 0, bottom: 3.0),
+                ),
+                Container(
+                  color: Colors.black12,
+                  width: double.maxFinite,
+                  height: 19.0,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      _checkSaray(),
+                      style: TextStyle(
+                        wordSpacing: 1.2,
+                        fontSize: 14.0,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(margin: EdgeInsets.only(top: 5.0, bottom: 0.0)),
 
                 StreamBuilder(
                   stream: bloc.movieDetail,
@@ -161,43 +218,48 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                 //   label: Text('Drama'),
                 // ),
                 Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
-                Text(
-                  "Similar Movies",
-                  style: TextStyle(
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
-                StreamBuilder(
-                  stream: bloc.similarMovies,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return FutureBuilder(
-                        future: snapshot.data,
-                        builder: (context, AsyncSnapshot<ItemModel> snapshot) {
-                          if (snapshot.hasData) {
-                            return similarMoviesLayout(snapshot.data);
-                          } else {
-                            return Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                        },
-                      );
-                    } else {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  },
-                ),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  Future _fetchFragman() async {
+    final int fragman = widget.movieId;
+    String fragmanurl = "https://www.youtube.com/";
+    http.Client client = http.Client();
+    final response = await client.get(
+        "https://api.themoviedb.org/3/movie/$fragman/videos?api_key=1afc6aafac53ed1a17ed12290f133121&language=tr-TR");
+    if (response.statusCode == 200) {
+      var _videos = json.decode(response.body);
+      if (!_videos['results'].isEmpty) {
+        _videos = _videos['results'][0]['key'];
+        fragmanurl = fragmanurl + 'watch?v=$_videos';
+      } else {
+        print('There is not any fragman...');
+      }
+      return launch(fragmanurl);
+    } else {
+      throw Exception('Error retrieving videos');
+    }
+  }
+
+  String _checkSaray() {
+    if (widget.comment2 == ' ' || widget.comment2 == '') {
+      return '';
+    } else {
+      return 'Saray:        ' + widget.comment2;
+    }
+  }
+
+  String _checkCineworld() {
+    if (widget.comment == ' ' || widget.comment == '') {
+      return '';
+    } else {
+      return 'Cineworld:  ' + widget.comment;
+    }
   }
 
   Widget chipLayout(MovieDetail data) {
@@ -252,7 +314,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
       return Padding(
         padding: const EdgeInsets.only(top: 20.0, left: 80.0, right: 20.0),
         child: Text(
-          'No Genres Found',
+          'Tür bilgisi bulunmamaktadır...',
           style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -263,7 +325,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
     }
   }
 
-  Widget similarMoviesLayout(ItemModel data) {
+/*Widget similarMoviesLayout(ItemModel data) {
     // if (data.results.length > 1) {
     if (data.results.isNotEmpty) {
       print('Inside if');
@@ -331,5 +393,5 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         ],
       ),
     );
-  }
+  } */
 }
